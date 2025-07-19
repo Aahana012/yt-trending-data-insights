@@ -129,7 +129,7 @@ I conducted exploratory data analysis (EDA) to examine content performance, user
 These trends demonstrate how YouTube's trending content has gained increasing traction over time, highlighting the platform’s dynamic nature.
 
 **Top Categories**
-Analyzing video categories helps identify which content types dominate in terms of visibility and engagement.
+Analyzing video categories helps identify which content types are most visible and engaging.
 
 *Top 10 Categories by Total Views*
 
@@ -249,3 +249,374 @@ Outlier analysis helps surface videos that over- or under-perform relative to th
 
 
 **5. Correlation, Insights, and Visualizations**
+In this section, significant insights and relationships within the dataset are highlighted through clear and concise visualizations.
+
+**Engagement Over Time**
+
+*Total Views Over Time*
+
+**CODE SNIPPET:**
+
+ggplot(daily_engagement, aes(x = trending_date, y = total_views)) 
++  geom_line(color = "steelblue") 
++  labs(
+    title = "Total Views Over Time (U.S. Trending Videos)",
+    x = "Trending Date",
+    y = "Total Views"
+  )
+
+**PLOT:**
+
+<img width="737" height="425" alt="Views Over Time" src="https://github.com/user-attachments/assets/cfdc778d-ceb7-4d6b-abde-c99ce8955e2c" />
+
+**FINDING:** A steady increase in daily views is observed, with spikes corresponding to viral content or major platform events.
+
+--------------------------------
+
+*Total Likes Over Time*
+
+**CODE SNIPPET:**
+
+ggplot(daily_engagement, aes(x = trending_date, y = total_likes)) 
++  geom_line(color = "darkgreen") 
++  labs(
+    title = "Total Likes Over Time (U.S. Trending Videos)",
+    x = "Trending Date",
+    y = "Total Likes"
+  )
+
+**PLOT:**
+
+<img width="737" height="425" alt="Likes Over Time" src="https://github.com/user-attachments/assets/5548764c-87d3-466a-9366-5cf371d22e28" />
+
+**FINDING:** Likes show a similar upward trend as views, with later peaks suggesting a concentration of high-performing videos.
+
+--------------------------------
+
+*Total Comments Over Time*
+
+**CODE SNIPPET:**
+
+ggplot(daily_engagement, aes(x = trending_date, y = total_comments)) 
++  geom_line(color = "purple") 
++  labs(
+    title = "Total Comments Over Time (U.S. Trending Videos)",
+    x = "Trending Date",
+    y = "Total Comments"
+) 
+
+**PLOT:**
+
+<img width="737" height="425" alt="Comments Over Time" src="https://github.com/user-attachments/assets/0e60a503-511f-448c-81f6-ba40a60d755d" />
+
+**FINDING:**  Comment activity exhibits a sawtooth pattern, with a notable rise around April, likely driven by discussion-worthy or controversial videos.
+
+-------------------------
+
+**Top Categories**
+
+*Top 10 Categories by Total Views*
+
+**CODE SNIPPET:** 
+
+top_categories_views <- yt_us %>%
++     group_by(category) %>%
++     summarise(total_views = sum(views, na.rm = TRUE)) %>%
++     arrange(desc(total_views)) %>%
++     slice_max(total_views, n = 10)
+
+ggplot(top_categories_views, aes(x = reorder(category, total_views), y = total_views)) +
++     geom_col(fill = "skyblue") +
++     coord_flip() +
++     labs(
++         title = "Top 10 Categories by Total Views",
++         x = "Category",
++         y = "Total Views"
++     )
+
+**PLOT:** 
+
+<img width="737" height="425" alt="Top 10 categories" src="https://github.com/user-attachments/assets/60db899c-b2ba-42ab-b78d-61d721acee7c" />
+
+**FINDING:** Music reigns as the most-watched category with over 40 billion total views, far surpassing others. It reflects the global popularity and replayable nature of music videos.
+
+<img width="411" height="498" alt="Screenshot 2025-07-19 185054" src="https://github.com/user-attachments/assets/9469ec75-b874-484a-91b1-1ea59f39a389" />
+
+------------------------
+
+*Top Categories by Average Engagement (Likes)*
+
+**CODE SNIPPET:** 
+
+top_categories_likes <- yt_us %>%
++     group_by(category) %>%
++     summarise(avg_likes = mean(likes, na.rm = TRUE)) %>%
++     arrange(desc(avg_likes)) %>%
++     slice_max(avg_likes, n = 10)
+
+ggplot(top_categories_likes, aes(x = reorder(category, avg_likes), y = avg_likes)) +
++     geom_col(fill = "coral") +
++     coord_flip() +
++     labs(
++         title = "Top 10 Categories by Average Likes",
++         x = "Category",
++         y = "Average Likes"
++     )
+
+**PLOT:** 
+
+<img width="737" height="425" alt="top 10 by avg likes" src="https://github.com/user-attachments/assets/ad5d2f78-43e0-4650-b7b0-26369b0e59cd" />
+
+**FINDING:** Nonprofits & Activism tops the average likes chart, showing high user engagement per video. Music follows closely, proving its emotional and entertainment value.
+
+<img width="400" height="486" alt="Screenshot 2025-07-19 185520" src="https://github.com/user-attachments/assets/79322893-160e-4ed6-bdb4-a616aae8f8a4" />
+
+---------------------------------
+
+**Best Time to Publish**
+
+*Average Views by Publish Hour*
+
+**CODE SNIPPET:**
+
+views_by_hour <- yt_us %>%
++     group_by(publish_hour) %>%
++     summarise(avg_views = mean(views, na.rm = TRUE)) %>%
++     arrange(publish_hour)
+> ggplot(views_by_hour, aes(x = publish_hour, y = avg_views)) +
++     geom_line(group = 1, linewidth = 1.2) +
++     geom_point(size = 2) +
++     scale_x_continuous(breaks = 0:23) +
++     labs(
++         title = "Average Views by Publish Hour",
++         x = "Hour of Day (0 = Midnight)",
++         y = "Average Views"
++     )
+
+**PLOT:**
+
+<img width="737" height="425" alt="avg views by publish hr" src="https://github.com/user-attachments/assets/a455793a-d0cb-4068-957a-5cfa53f79e43" />
+
+**FINDING:** Engagement peaks around 4 AM and 9–10 AM—likely due to YouTube’s promotion algorithm—while views decline through the afternoon and evening.
+
+-------------------------------
+
+*Average Views by Day of the Week*
+
+**CODE SNIPPET:**
+
+yt_us <- yt_us %>%
++     mutate(publish_wday = wday(publish_date, label = TRUE))
+> 
+> views_by_wday <- yt_us %>%
++     group_by(publish_wday) %>%
++     summarise(avg_views = mean(views, na.rm = TRUE))
+> ggplot(views_by_wday, aes(x = publish_wday, y = avg_views)) +
++     geom_col(fill = "darkseagreen3") +
++     labs(
++         title = "Average Views by Day of the Week",
++         x = "Day of Week",
++         y = "Average Views"
++     )
+
+**PLOT:**
+
+<img width="737" height="425" alt="avg views by day of wk" src="https://github.com/user-attachments/assets/84968ac5-2604-4db6-bdfb-09b531e3aa94" />
+
+**FINDING:** Friday and Sunday yield the highest average views, while Monday to Wednesday perform moderately and Saturday sees the lowest viewership.
+
+--------------------------------------
+
+**Correlation Analysis**
+
+**CODE SNIPPET:**
+
+cor_data <- yt_us %>%
++     select(views, likes, dislikes, comment_count)
+> cor_matrix <- cor(cor_data, use = "complete.obs")
+> print(cor_matrix)
+                  views     likes  dislikes comment_count
+views         1.0000000 0.8491765 0.4722132     0.6176213
+likes         0.8491765 1.0000000 0.4471865     0.8030569
+dislikes      0.4722132 0.4471865 1.0000000     0.7001836
+comment_count 0.6176213 0.8030569 0.7001836     1.0000000
+
+corrplot(cor_matrix, method = "color", type = "upper", 
++          tl.col = "black", tl.srt = 45, addCoef.col = "black", 
++          number.cex = 0.8, col = colorRampPalette(c("lightblue", "white", "red"))(200))
+
+**PLOT:**
+
+<img width="737" height="425" alt="Correlation heatmap" src="https://github.com/user-attachments/assets/26577ed6-72bf-43b2-aacc-1428443749d4" />
+
+**FINDING:** Correlation analysis shows that views and likes are strongly linked (r = 0.85), with moderate ties among comments, dislikes, and likes—indicating that both appreciation and controversy fuel engagement.
+
+-----------------------------
+
+**Views vs Likes**
+
+**CODE SNIPPET:**
+
+ggplot(yt_us, aes(x = views, y = likes)) 
++     geom_point(alpha = 0.4) 
++     geom_smooth(method = "lm", se = FALSE, color = "red") 
++     labs(title = "Views vs Likes", x = "Views", y = "Likes")
+
+**PLOT:**
+
+<img width="737" height="425" alt="Views vs Likes" src="https://github.com/user-attachments/assets/c65383f8-17d0-418b-a4e3-f46631b456d0" />
+
+**FINDING:** The plot reveals a strong positive linear relationship between views and likes, confirming that increased visibility generally leads to higher user appreciation despite some outliers.
+
+---------------------------
+
+**Outliers**
+
+**CODE SNIPPET:**
+
+yt_us <- yt_us %>%
++     mutate(
++         like_view_ratio = ifelse(views == 0, NA, likes / views)
++     )
+> threshold_high <- quantile(yt_us$like_view_ratio, 0.99, na.rm = TRUE)
+> threshold_low <- quantile(yt_us$like_view_ratio, 0.01, na.rm = TRUE)
+> 
+> high_like_low_view <- yt_us %>%
++     filter(like_view_ratio >= threshold_high) %>%
++     select(title, channel_title, views, likes, like_view_ratio) %>%
++     arrange(desc(like_view_ratio))
+> high_view_low_like <- yt_us %>%
++     filter(like_view_ratio <= threshold_low) %>%
++     select(title, channel_title, views, likes, like_view_ratio) %>%
++     arrange(like_view_ratio)
+> head(high_like_low_view, 5)
+
+# A tibble: 5 × 5
+  title                                   channel_title  views  likes like_view_ratio
+  <chr>                                   <chr>          <dbl>  <dbl>           <dbl>
+1 Bruno Mars - Finesse (Remix) [Feat. Ca… Bruno Mars    5.49e5 1.59e5           0.290
+2 Luis Fonsi, Demi Lovato - Échame La Cu… LuisFonsiVEVO 5.00e5 1.35e5           0.271
+3 j-hope 'Airplane' MV                    ibighit       5.28e6 1.40e6           0.266
+4 dodie - Secret For The Mad              dodieVEVO     1.29e5 3.28e4           0.254
+5 Louis Tomlinson - Miss You (Official V… LouisTomlins… 9.86e5 2.42e5           0.245
+
+> head(high_view_low_like, 5)
+
+title                                     channel_title views likes like_view_ratio
+  <chr>                                     <chr>         <dbl> <dbl>           <dbl>
+1 Apple Clips sample                        Steve Kovach   2259     0               0
+2 Breaking Bad's Bryan Cranston on Meeting… hudsonunions… 15058     0               0
+3 Kelly Oubre Punches John Wall in the Lea… Rob Andretti   2197     0               0
+4 Breaking Bad's Bryan Cranston on Meeting… hudsonunions… 34207     0               0
+5 Kelly Oubre Punches John Wall in the Lea… Rob Andretti   2447     0               0
+
+yt_us %>%
++     filter(!is.na(like_view_ratio), like_view_ratio > 0) %>%
++     ggplot(aes(x = like_view_ratio)) +
++     geom_histogram(bins = 100, fill = "steelblue", color = "white") +
++     scale_x_log10() +
++     geom_vline(xintercept = quantile(yt_us$like_view_ratio, 0.99, na.rm = TRUE),
++                color = "red", linetype = "dashed", linewidth = 1) +
++     geom_vline(xintercept = quantile(yt_us$like_view_ratio, 0.01, na.rm = TRUE),
++                color = "red", linetype = "dashed", linewidth = 1) +
++     labs(
++         title = "Distribution of Like-to-View Ratio (Log Scale)",
++         x = "Like-to-View Ratio (log10)",
++         y = "Number of Videos"
++     )
+
+**PLOT:** 
+
+<img width="737" height="425" alt="Dist of Like to view ratio" src="https://github.com/user-attachments/assets/8b347a23-9434-49d4-8fbc-200722838284" />
+
+**FINDING:** Most videos have a like-to-view ratio between 0.01 and 0.05, but extreme outliers reveal unique viewer responses—either high resonance or low approval—offering key insights for content strategy.
+
+---------------------------
+
+**6. Conclusions and Recommendations**
+
+**Conclusion:**
+
+•	Engagement is multifaceted: While views indicate reach, metrics like likes and comments better reflect audience sentiment and content impact.
+
+•	Category matters: Music and Entertainment dominate in viewership, but niche categories like Nonprofits & Activism generate stronger per-video engagement.
+
+•	Timing influences visibility: Early morning uploads (especially around 4 AM and 9–10 AM) and end-of-week days (Friday, Sunday) consistently show higher engagement, suggesting strategic publishing times.
+
+•	Viewer response patterns vary: Most videos follow expected engagement ratios, but outliers—both positive and negative—reveal insights into content that resonates deeply or underperforms despite visibility.
+
+**Recommendations:**
+
+•	Optimize for timing: Publish videos in the early morning and on high-engagement days (Friday, Sunday) to maximize visibility.
+
+•	Prioritize engagement: Create content that encourages likes and comments, especially in high-performing or emotionally resonant categories.
+
+•	Refine with data: Regularly analyze top and low-performing videos to understand what drives strong audience reactions and adjust strategy accordingly.
+
+**7. Appendix**
+
+**Data Files Used**
+
+•	USvideos.csv – Raw dataset containing metadata for trending YouTube videos in the U.S.
+
+•	US_category_id.json – JSON file mapping category_id to readable category names
+
+**R Packages**
+
+•	tidyverse – Data manipulation and visualization
+
+•	lubridate – Date-time parsing and feature engineering
+
+•	janitor – Cleaning column names
+
+•	ggplot2 – Plotting visualizations
+
+•	corrplot – Generating correlation heatmaps
+
+•	skimr – Exploring data structure and summaries
+
+•	jsonlite – Reading and parsing JSON files
+
+**Key Steps**
+
+•	Cleaned column names using janitor::clean_names()
+
+•	Parsed trending_date and publish_time using lubridate to create publish_date and publish_hour
+
+•	Mapped category_id to category names using US_category_id.json via jsonlite
+
+•	Created new features like like_view_ratio and publish_wday for analysis
+
+•	Filtered or excluded rows with non-finite values during visualization stages
+
+**Sample Code Snippet**
+
+~
+# Load and clean base dataset
+yt_us <- read_csv("USvideos.csv") %>%
+  clean_names()
+
+# Parse dates and create time features
+yt_us <- yt_us %>%
+  mutate(
+    trending_date = as.Date(trending_date, format = "%y.%d.%m"),
+    publish_date = as.Date(publish_time),
+    publish_hour = hour(publish_time)
+  )
+
+# Load and join category names
+category_json <- fromJSON("US_category_id.json")
+category_df <- as_tibble(category_json$items)
+category_lookup <- category_df %>%
+  transmute(
+    category_id = as.integer(id),
+    category = snippet$title
+  )
+
+yt_us <- yt_us %>%
+  left_join(category_lookup, by = "category_id") %>%
+  select(-thumbnail_link, -description)
+
+~
+
+**End of Report**
