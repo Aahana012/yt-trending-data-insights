@@ -16,50 +16,88 @@ The goal is to derive actionable insights that can help content creators optimiz
 
 **2. Data Description**
 The dataset used for this analysis is the YouTube Trending Videos dataset, originally published on Kaggle. It contains daily records of trending videos across multiple countries, including metadata such as:
+
 •	Video title and channel name
+
 •	Publish and trending dates
+
 •	View, like, dislike, and comment counts
+
 •	Tags and video category
+
 •	Thumbnail link and description
+
 •	Country of trend
+
 For this case study, the focus was on the United States dataset to maintain consistency in audience demographics and time zones.
 
 **3. Data Cleaning & Preparation**
 I used R to clean, transform, and prepare the YouTube Trending Videos (US) dataset. The following steps were performed to ensure the data was analysis-ready:
-________________________________________
+
 Tools and Packages
+
   •	R programming language
+  
   •	tidyverse – for data manipulation and visualization
+  
   •	janitor – for cleaning column names
+  
   •	lubridate – for date-time conversions
+  
   •	jsonlite – for parsing category metadata (JSON format)
+  
   •	skimr – for summarizing and inspecting data
 
 *Steps*
+
 Loading Data
+  
   •	Imported USvideos.csv and US_category_id.json.
+  
   •	Cleaned column names using janitor::clean_names().
 Date Conversion
+  
+  
   •	Converted trending_date to proper Date format using as.Date() with the format "%y.%d.%m".
+ 
   •	Parsed publish_time with ymd_hms() and extracted:
+    
     o	publish_date – as a Date object
+    
     o	publish_hour – hour of day using lubridate::hour()
+    
     o	publish_wday – weekday using wday(label = TRUE)
+
 Mapping Categories
+
   •	Used jsonlite to read the US_category_id.json file.
+  
   •	Created a category variable by mapping category_id to category names using a lookup table.
+
 Removing Unnecessary Columns
+  
   •	Dropped thumbnail_link and description to reduce clutter for analysis.
+
 Handling Missing Values
+
   •	Used skim() and colSums(is.na()) to assess missingness.
+  
   •	Verified no missing values in key engagement metrics (e.g., views, likes, comments).
+
 Feature Engineering
+
   •	Created like_view_ratio = likes/views to measure engagement quality.
+  
   •	This metric was later used for outlier detection and visualization.
+
 Duplicate Check
+
   •	Ensured each video-date combination was unique by inspecting video_id + trending_date.
+  
   •	No exact duplicates were found post-cleaning.
+
 Exporting Clean Data
+
   •	Cleaned dataset retained 40,949 rows across 17 variables and was used directly for further EDA.
 
 This structured and transformed dataset provided a reliable foundation for the subsequent exploratory data analysis and insight generation phases.
