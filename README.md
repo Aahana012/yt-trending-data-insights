@@ -591,12 +591,13 @@ yt_us %>%
 
 **Sample Code Snippet**
 
-~
-# Load and clean base dataset
+*Load and clean base dataset*
+
 yt_us <- read_csv("USvideos.csv") %>%
   clean_names()
 
-# Parse dates and create time features
+*Parse dates and create time features*
+
 yt_us <- yt_us %>%
   mutate(
     trending_date = as.Date(trending_date, format = "%y.%d.%m"),
@@ -604,7 +605,8 @@ yt_us <- yt_us %>%
     publish_hour = hour(publish_time)
   )
 
-# Load and join category names
+*Load and join category names*
+
 category_json <- fromJSON("US_category_id.json")
 category_df <- as_tibble(category_json$items)
 category_lookup <- category_df %>%
@@ -617,6 +619,4 @@ yt_us <- yt_us %>%
   left_join(category_lookup, by = "category_id") %>%
   select(-thumbnail_link, -description)
 
-~
-
-**End of Report**
+**End of report**
